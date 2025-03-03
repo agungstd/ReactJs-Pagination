@@ -2,10 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
+const LIMIT = 10;
+
 const PersonalList = () => {
   const [personals, setPersonals] = useState([]);
   const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(LIMIT);
   const [pages, setPages] = useState(0);
   const [rows, setRows] = useState(0);
   const [keyword, setKeyword] = useState("");
@@ -13,14 +15,18 @@ const PersonalList = () => {
   const [msg, setMsg] = useState("");
 
   const getPersonals = async () => {
-    setLimit(10);
-    const response = await axios.get(
-      `/api/personals?search=${keyword}&limit=${limit}&page=${page}`
-    );
-    setPersonals(response.data.result);
-    setPage(response.data.page);
-    setPages(response.data.totalPages);
-    setRows(response.data.totalRows);
+    try {
+      const response = await axios.get(
+        `/api/personals?search=${keyword}&limit=${limit}&page=${page}`
+      );
+      setPersonals(response.data.result);
+      setPage(response.data.page);
+      setPages(response.data.totalPages);
+      setRows(response.data.totalRows);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setMsg("Error fetching data. Please try again later.");
+    }
   };
 
   useEffect(() => {
@@ -37,7 +43,7 @@ const PersonalList = () => {
     }
   };
 
-  const serchData = (e) => {
+  const searchData = (e) => {
     e.preventDefault();
     setPage(0);
     setKeyword(query);
@@ -49,7 +55,7 @@ const PersonalList = () => {
       <div className="container mt-5">
         <div className="columns">
           <div className="column is-centered">
-            <form onSubmit={serchData}>
+            <form onSubmit={searchData}>
               <div className="field has-addons">
                 <div className="control is-expanded">
                   <input
